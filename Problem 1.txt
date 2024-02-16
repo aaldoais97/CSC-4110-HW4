@@ -1,0 +1,186 @@
+#Homework 4, Problem 1
+#Revision 2/15/24
+#Start Aimen Al-Doais
+import random
+import tkinter as tk
+from tkinter import  simpledialog, messagebox
+
+#Global database
+orderRecords = {}
+
+#Start function definitions----------------------------------
+
+#This function generates random order data for a single order
+#and returns it
+def data_collector():
+    #Declaration of all order attributes
+    data = []
+    username = ""
+    password = ""
+    birthdate = ""
+    address = ""
+    socialSec = ""
+    productPur = []
+    salesperson = ""
+
+    #Declaration of all components for generating attributes
+    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+    symbols = ["!", "@", "#", "$", "%", "^", "&", "*", "-", "_", " ", "(", ")", "/", "=", "+", "~"]
+    names1 = ["charlie", "pim", "callie", "socks", "luna",
+              "jimmy"]
+    names2 = ["bigglesworth", "hoffa", "smith", "jackson"]
+    #Adds 5 random letters to each name section in order to reduce
+    #chances of two-letter starts to username..
+    for i in range(5):
+        names1.append(random.choice(alphabet))
+        names2.append(random.choice(alphabet))
+    streets = ["Maple ln", "Walden st", "Main st", "Heydenreich rd"]
+    products = ["standard tank", "standard refill", "20ct tank",
+                "20ct refill"]
+    salespeople = ["Boomhauer", "Bill", "Hank", "Dale"]
+
+
+    #This section generates values for the attributes. Some numbers were
+    #excluded for the sake of simplicity and formatting.
+    username = random.choice(names1) + random.choice(names2) + random.choice(numbers) + random.choice(numbers)
+
+    for i in range(8):
+        password += random.choice(alphabet + numbers + symbols)
+    
+    birthdate = str(random.randint(1, 12)) + "/" + str(random.randint(1, 29)) + "/" + str(random.randint(10, 99))
+
+    address = str(random.randint(1, 9999)) + " " + random.choice(streets)
+
+    socialSec = str(random.randint(100, 999)) + "-" + str(random.randint(10, 99)) + "-" + str(random.randint(1000, 9999))
+
+    salesperson = random.choice(salespeople)
+
+    #Below body generates productPur attribute
+    quantity = 0
+    total = 0.0
+    productPur.append(random.choice(products))
+    if (productPur[0] == "standard tank"):
+        quantity = random.randint(1, 19)
+        total = 49.99 * quantity
+    elif (productPur[0] == "standard refill"):
+        quantity = random.randint(1, 19)
+        total = 19.99 * quantity
+    elif (productPur[0] == "20ct tank"):
+        quantity = 1
+        total = 799.99
+    else:
+        quantity = 1
+        total = 299.99
+    productPur.append(quantity)
+    productPur.append(total)
+
+    #Add attributes into order data
+    data.append(username)
+    data.append(password)
+    data.append(birthdate)
+    data.append(address)
+    data.append(socialSec)
+    data.append(productPur)
+    data.append(salesperson)
+
+    return data
+
+#This function displays all attributes of a given entry in a dictionary if it is found
+def display_data(dict, key):
+        if(dict[key]):
+            print("Username: " + dict[key][0])
+            print("Password: " + dict[key][1])
+            print("Birthdate: " + dict[key][2])
+            print("Address: " + dict[key][3])
+            print("Social Security #: " + dict[key][4])
+            print("Product: " + str(dict[key][5][0]))
+            print("Quantity: " + str(dict[key][5][1]))
+            print("Total: " + str(dict[key][5][2]))
+            print("Salesperson: " + dict[key][6])
+        else:
+            print("Order not found!")
+        
+        print()
+
+#Start edited code from Project 1-----------------------
+#This function searches a dictionary for a value based on the option selected
+def search(dict, searchkey, option):
+    found = False
+
+    if option == 0:     #Username
+        for entry in dict:
+            if dict[entry][0] == searchkey:
+                found = True
+                display_data(dict, entry)
+    elif option == 1:    #Salesman
+        for entry in dict:
+            if dict[entry][6] == searchkey:
+                found = True
+                display_data(dict, entry)
+    elif option == 2:    #Social Security #
+        for entry in dict:
+            if entry == searchkey:
+                found = True
+                display_data(dict, entry)
+
+    if not found:
+        messagebox.showinfo("Search Results", "Order not found!")
+    
+    
+
+#This function handles clicked option by user
+def on_button_click(clicked_index):
+    if clicked_index == 0:
+        search_id = simpledialog.askstring("Search by Username", "Enter username to search:")
+        if search_id is not None:
+            search(orderRecords, search_id, 0)
+    elif clicked_index == 1:
+        search_id = simpledialog.askstring("Search by Salesperson", "Enter name to search:")
+        if search_id is not None:
+            search(orderRecords, search_id, 1)
+    elif clicked_index == 2:
+        search_id = simpledialog.askstring("Search by SS#", "Enter SS# to search:")
+        if search_id is not None:
+            search(orderRecords, search_id, 2)
+    else:
+        pass
+
+#End edited code from Project1---------------------------
+#End function definitions-------------------------------------------------
+
+
+#Start of main body of code-----------------------------------------------
+tempdata = []
+forbidden = [" ", "(", ")", "/", "=", "+", "~"]
+
+#Generates 10 orders for records
+while len(orderRecords) < 10:
+    tempdata = data_collector()
+
+    #Filters out duplicate SS#s and forbidden characters in passwords
+    if(not tempdata[4] in orderRecords and (not any(character in forbidden for character in tempdata[1]))):
+        orderRecords[tempdata[4]] = tempdata
+
+#Prints entire records for testing purposes
+print(orderRecords)
+
+#Start edited code from Project 1--------------
+root = tk.Tk()
+root.title("Strickland Propane Order Log")
+
+frame = tk.Frame(root)
+frame.pack(expand=False, fill=tk.BOTH)
+
+buttons = []
+BUTTON_TEXTS = ["Search by Username", "Search by Salesperson", "Search by SS#"]
+for i, text in enumerate(BUTTON_TEXTS):
+    btn = tk.Button(frame, text=text, height=3, width=20, command=lambda i=i: on_button_click(i))
+    btn.pack(side=tk.LEFT, padx=10, pady=10)  # Pack buttons to the left side with padding
+    buttons.append(btn)
+
+root.mainloop()
+#End edited code from Project 1----------------
+#End main body of code---------------------------------------------------
+#Revision 2/15/24
+#End Aimen Al-Doais

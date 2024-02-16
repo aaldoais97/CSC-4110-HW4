@@ -1,0 +1,95 @@
+#Homework 4, Problem 2
+#Revision 2/15/24
+#Start Aimen Al-Doais
+
+import random
+
+#This game starts the player with 8 spins and a randomly populated treasure #chest to grab from once per spin. The player can find gold and other treasure
+#until they run out of spins
+class PiratesBooty:
+    def __init__(self):
+        self.spins = 8 #initial spins
+        self.loot = [] #player's loot from playing
+        self.gold = 0  #player's gold earnings
+        #treasure chest initialized with grand prize
+        self.treasure = ["real, authentic Sword of Triton"]
+
+        treasureOptionsRare = ["100 dubloons", "sack of emeralds", "artisan sabre", "luxury peg leg"]
+        treasureOptionsCommon = ["1 dubloon", "5 dubloons", "10 dubloons", "basic sabre", "worn peg leg", "brick of hard tack"]
+
+        #populate treasure chest for 30 slots total
+        for i in range(29):
+            rng = random.randint(1, 100)
+            if rng > 90:    #10% chance of rare item
+                self.treasure.append(random.choice(treasureOptionsRare))
+            elif rng > 50:  #40% chance of common item
+                self.treasure.append(random.choice(treasureOptionsCommon))
+            else:           #50% chance of empty slot
+                self.treasure.append("empty")
+    
+    def spin(self):
+        choice = random.randint(0, 29)
+        hand = self.treasure[choice]
+        self.spins -= 1
+
+        #handle the result of the grab (bonus spins with high-ticket items)
+        match(hand):
+            case "empty":
+                print("Argh! You didn't grab anything!")
+            case "1 dubloon":
+                self.gold += 1
+                print("You found 1 gold dubloon!")
+            case "5 dubloons":
+                self.gold += 5
+                print("You found 5 gold dubloons!")
+            case "10 dubloons":
+                self.gold += 10
+                print("You found 10 gold dubloons!")
+            case "100 dubloons":
+                self.gold += 100
+                self.spins += 1
+                print("Shiver me timbers! You found 100 gold and a bonus spin!!!")
+            case "sack of emeralds":
+                self.loot.append(hand)
+                self.spins += 1
+                print(f"Shiver me timbers! You found a {hand} and a bonus spin!!!")
+            case "artisan sabre":
+                self.loot.append(hand)
+                self.spins += 1
+                print(f"Shiver me timbers! You found a {hand} and a bonus spin!!!")
+            case "luxury peg leg":
+                self.loot.append(hand)
+                self.spins += 1
+                print(f"Shiver me timbers! You found a {hand} and a bonus spin!!!")
+            case "real, authentic Sword of Triton":
+                self.loot.append(hand)
+                self.spins += 3
+                print(f"By the grace of Neptune! You found the grand prize!!! The {hand} and 3 bonus spins!")
+            case _:
+                self.loot.append(hand)
+                print(f"You found a {hand}!")
+
+        #make the slot empty after grabbing
+        self.treasure[choice] = "empty"
+    
+
+#Start main body of code
+#Create instance of game
+game = PiratesBooty()
+
+print("Ahoy!! Welcome to Pirate's Booty! Let's see how great your bounty will be!\n")
+
+#While user has spins left, let them spin to collect loot
+while (game.spins > 0):
+    input("Press enter to spin!")
+    game.spin()
+
+#When spins are exhausted, display loot and gold
+print("\nYou've used up all your spins. Let's take a look at your loot haul.")
+print("Loot:")
+for item in game.loot:
+    print(item)
+print("\nGold: " + str(game.gold))
+
+#End main body of code
+#End revision 2/15/24
